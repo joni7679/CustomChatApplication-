@@ -46,20 +46,5 @@ router.get('/message/:conversationId', async (req, res) => {
     }
 })
 
-router.delete('/message/:id', async (req, res) => {
-    try {
-
-    } catch (error) {
-
-    }
-})
-
-router.put('/message/:id', async (req, res) => {
-    try {
-
-    } catch (error) {
-
-    }
-})
 
 module.exports = router

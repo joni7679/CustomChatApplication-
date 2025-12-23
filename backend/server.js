@@ -2,9 +2,12 @@ const express = require('express')
 const app = express();
 const connectToDatabase = require('./src/db/db');
 const messageRouter = require('./src/routes/message.routes')
+const dotenv = require('dotenv');
+dotenv.config()
 connectToDatabase()
-const port = 3000
+
 app.use(express.json())
+
 app.get('/', (req, res) => {
     res.send('Hello World!')
 })
@@ -14,7 +17,7 @@ app.get('/about', (req, res) => {
 })
 
 app.use('/api', messageRouter)
-
+const port = process.env.PORT || 3000
 app.listen(port, () => {
     console.log(`server is running up ${port}`)
 })
