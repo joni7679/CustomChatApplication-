@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { X, Send } from "lucide-react";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { nanoid } from 'nanoid'
 import { MdDelete } from "react-icons/md";
 import { FiEdit } from "react-icons/fi";
+import { use } from "react";
 
 const ChatWidget = ({ toggleChatWidget }) => {
+    const bottomRef = useRef()
     const [userSms, setUserSms] = useState("");
     const [message, setMessage] = useState([]);
     const [openDotsId, setOpenDotsId] = useState(null)
@@ -24,6 +26,7 @@ const ChatWidget = ({ toggleChatWidget }) => {
     const handelSendSms = () => {
         if (!userSms) {
             alert("this filled is required!")
+            return
         }
         const newMessage = {
             id: nanoid(),
@@ -32,8 +35,6 @@ const ChatWidget = ({ toggleChatWidget }) => {
             time: new Date().toLocaleTimeString()
         }
         setMessage((prev) => [...prev, newMessage])
-        console.log("sns", newMessage);
-
         setUserSms('')
     }
     const handelkeyDown = (e) => {
@@ -42,6 +43,9 @@ const ChatWidget = ({ toggleChatWidget }) => {
             handelSendSms();
         }
     };
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [message]);
 
     return (
         <div className="fixed max-w-md w-full bottom-[73px] right-6  bg-white rounded-2xl shadow-md overflow-hidden font-sans">
@@ -83,14 +87,16 @@ const ChatWidget = ({ toggleChatWidget }) => {
                                 </div>
                                 <div className={`w-[30px] p-5 rounded bg-white shadow-lg absolute top-[50px] right-1 flex items-center justify-center gap-1.5 flex-col  duration-150 ${openDotsId === id ? "scale-[1]" : "scale-0"}`}>
                                     <MdDelete onClick={() => handeldeleteSms(val.id)} className="cursor-pointer text-red-600" />
-                                    <FiEdit onClick={()=>handelEditSms(id)} className="cursor-pointer text-blue-500" />
+                                    <FiEdit onClick={() => handelEditSms(id)} className="cursor-pointer text-blue-500" />
                                 </div>
                                 <HiOutlineDotsVertical onClick={() => handelDots(id)} className="cursor-pointer" />
                             </div>
                         )
                     })
                 }
+                <div ref={bottomRef}></div>
             </div>
+
             <div className="flex items-center gap-2 px-3 py-2 border-t bg-white">
                 <input
                     type="text"
