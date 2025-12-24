@@ -1,12 +1,17 @@
 import React, { useState } from 'react'
 import { IoChatbubbles } from "react-icons/io5";
 import ChatWidget from './components/ChatWidget';
+import { useEffect } from 'react';
 
 const App = () => {
   const [isOpen, setIsOpen] = useState('');
   const toggleChatWidget = () => {
     setIsOpen(!isOpen);
   }
+
+  useEffect(() => {
+
+  }, [])
   return (
     <>
       <section className='bg-white w-full min-h-screen relative'>

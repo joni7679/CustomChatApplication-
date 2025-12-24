@@ -1,17 +1,23 @@
 import React, { useState, useRef, useEffect } from "react";
 import { X, Send } from "lucide-react";
 import { HiOutlineDotsVertical } from "react-icons/hi";
-import { nanoid } from 'nanoid'
 import { MdDelete } from "react-icons/md";
 import { FiEdit } from "react-icons/fi";
-import { use } from "react";
 import ChatMessage from "./ChatMessage";
+import axios from "axios";
 
 const Dashboard = () => {
+    const Apiurl = import.meta.env.VITE_SERVER_URL;
+    console.log("Api", Apiurl);
+    const AdminId = "admin_1";
     const bottomRef = useRef()
+    const [adminSms, setadminSms] = useState("");
+    const [openDotsId, setOpenDotsId] = useState(null);
+    const [conversations, setConversations] = useState([]);
+    const [activeConversation, setActiveConversation] = useState(null);
+    const [messages, setMessages] = useState([]);
     const [userSms, setUserSms] = useState("");
-    const [message, setMessage] = useState([]);
-    const [openDotsId, setOpenDotsId] = useState(null)
+
     const handelDots = (id) => {
         setOpenDotsId((prev) => (prev === id ? null : id))
     }
@@ -24,18 +30,25 @@ const Dashboard = () => {
         console.log("editsms", id);
     }
 
-    const handelSendSms = () => {
-        if (!userSms) {
+    const handelSendSms = async () => {
+        if (!adminSms) {
             alert("this filled is required!")
             return
         }
         const newMessage = {
-            id: nanoid(),
-            text: userSms,
-            sender: "user",
-            time: new Date().toLocaleTimeString()
+            text: adminSms,
+            sender: "admin",
+            // senderId: userId,
+            // receiverId: AdminId,
+            // conversationId: `${userId}_${AdminId}`
+        };
+        try {
+            const res = await axios.post(`${Apiurl}/api/message`, newMessage);
+            console.log("res", res);
+            setMessage((prev) => [...prev, newMessage])
+        } catch (error) {
+            console.log("error", error);
         }
-        setMessage((prev) => [...prev, newMessage])
         setUserSms('')
     }
     const handelkeyDown = (e) => {
@@ -44,9 +57,22 @@ const Dashboard = () => {
             handelSendSms();
         }
     };
+
+    const handelFetchMessage = async () => {
+        try {
+
+        } catch (error) {
+            console.log("error", error);
+        }
+    }
+
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [message]);
+        handelFetchMessage()
+    }, [])
+
+    // useEffect(() => {
+    //     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    // }, [message]);
 
     return (
         <>
@@ -76,7 +102,7 @@ const Dashboard = () => {
                                 <div className="text-[10px] text-gray-400 mt-1">10:23 AM</div>
                             </div>
                         </div>
-
+{/* 
                         {
                             message.map((val, index) => {
                                 const { id, text, time } = val
@@ -96,7 +122,7 @@ const Dashboard = () => {
                                     </div>
                                 )
                             })
-                        }
+                        } */}
                         <div ref={bottomRef}></div>
                     </div>
 
