@@ -101,11 +101,16 @@ const ChatWidget = ({ toggleChatWidget }) => {
                 <p className="text-center text-xs text-gray-400">Today</p>
                 {
                     message.map((val) => {
-                        const { conversationId, createdAt, sender, text, _id } = val
+                        const { createdAt, sender, text, _id } = val;
+                        
+
                         return (
                             <div key={_id} className={` flex mb-3 ${sender === "admin" ? "justify-start" : "justify-end"}`}>
                                 <div className={`rounded-2xl p-4 max-w-[70%] shadow-md text-sm ${sender === "admin" ? "bg-white text-black" : "bg-blue-500 text-white"}`}>
                                     {text}
+                                    <div>
+                                        {/* <span>{formatTime}</span> */}
+                                    </div>
                                 </div>
                             </div>
 
