@@ -17,6 +17,7 @@ app.get('/about', (req, res) => {
     res.send(' about')
 })
 app.use('/api', messageRouter)
+
 const port = process.env.PORT || 3000
 app.listen(port, () => {
     console.log(`server is running up ${port}`)

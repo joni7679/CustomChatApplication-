@@ -1,22 +1,10 @@
-import React from "react";
-
-const ChatMessage = () => {
+const ChatMessage = ({ userId, lastMessage, isActive, onClick }) => {
     return (
-        <div className="flex items-start gap-3 relative max-w-xl">
-            <img
-                src="https://i.pravatar.cc/40"
-                alt="avatar"
-                className="w-10 h-10 rounded-full object-cover"
-            />
-            <div className="relative bg-gray-100 rounded-xl px-4 py-3 w-full">
-               
-                <div className="flex items-center justify-between mb-1">
-                    <h4 className="font-semibold text-gray-900 text-sm">
-                        user1
-                    </h4>
-                    
-                </div>
-            </div>
+        <div onClick={onClick}
+            className={`p-3 mb-2 rounded-lg cursor-pointer ${isActive ? "bg-blue-100" : "bg-gray-100"
+                }`}>
+            <p className="font-medium">{userId}</p>
+            <p className="text-xs text-gray-500">{lastMessage}</p>
         </div>
     );
 };

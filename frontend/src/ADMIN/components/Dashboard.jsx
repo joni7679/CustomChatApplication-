@@ -8,29 +8,37 @@ import axios from "axios";
 
 const Dashboard = () => {
     const Apiurl = import.meta.env.VITE_SERVER_URL;
-    console.log("Api", Apiurl);
     const AdminId = "admin_1";
     const bottomRef = useRef()
     const [adminSms, setadminSms] = useState("");
-    const [openDotsId, setOpenDotsId] = useState(null);
     const [conversations, setConversations] = useState([]);
     const [activeConversation, setActiveConversation] = useState(null);
     const [messages, setMessages] = useState([]);
-    const [userSms, setUserSms] = useState("");
 
-    const handelDots = (id) => {
-        setOpenDotsId((prev) => (prev === id ? null : id))
+    const handelFetchUserList = async () => {
+        try {
+            const res = await axios.get(`${Apiurl}/api/message/conversations`);
+            setConversations(res.data.data);
+            console.log("conversations", res.data.data);
+        } catch (error) {
+            console.log("error fetching user", error);
+        }
     }
 
-    const handeldeleteSms = (id) => {
-        console.log("deletems", id);
-
+    const handelFetchMessage = async (conversationId) => {
+        try {
+            const res = await axios.get(`${Apiurl}/api/message/${conversationId}`);
+            setMessages(res.data.data)
+        } catch (error) {
+            console.log("error fetching messages", error)
+        }
     }
-    const handelEditSms = (id) => {
-        console.log("editsms", id);
-    }
 
-    const handelSendSms = async () => {
+    const handleUserClick = (conv) => {
+        setActiveConversation(conv);
+        handelFetchMessage(conv._id);
+    };
+    const handleSendSms = async () => {
         if (!adminSms) {
             alert("this filled is required!")
             return
@@ -38,110 +46,117 @@ const Dashboard = () => {
         const newMessage = {
             text: adminSms,
             sender: "admin",
-            // senderId: userId,
-            // receiverId: AdminId,
-            // conversationId: `${userId}_${AdminId}`
+            senderId: AdminId,
+            receiverId: activeConversation.userId,
+            conversationId: activeConversation._id
         };
         try {
             const res = await axios.post(`${Apiurl}/api/message`, newMessage);
             console.log("res", res);
-            setMessage((prev) => [...prev, newMessage])
+            setadminSms('')
+            setMessages((prev) => [...prev, newMessage])
         } catch (error) {
             console.log("error", error);
         }
-        setUserSms('')
+
     }
-    const handelkeyDown = (e) => {
+    const handlekeyDown = (e) => {
         if (e.key === "Enter") {
             e.preventDefault();
-            handelSendSms();
+            handleSendSms();
         }
     };
 
-    const handelFetchMessage = async () => {
-        try {
-
-        } catch (error) {
-            console.log("error", error);
-        }
-    }
 
     useEffect(() => {
-        handelFetchMessage()
+        handelFetchUserList()
     }, [])
 
-    // useEffect(() => {
-    //     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    // }, [message]);
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
 
     return (
         <>
             <section className="flex items-center justify-center">
                 <div className="w-[30%] bg-white shadow-md min-h-screen">
                     <div className='mt-11 p-5' >
-                        <ChatMessage />
+                        {
+                            conversations.length === 0 && (
+                                <div>
+                                    <p className="">no users yet </p>
+                                </div>
+                            )
+                        }
+                        {
+                            conversations.map((conv) => {
+                                return (
+                                    <ChatMessage
+                                        key={conv._id}
+                                        userId={conv.userId}
+                                        lastMessage={conv.lastMessage}
+                                        isActive={activeConversation?._id === conv._id}
+                                        onClick={() => handleUserClick(conv)}
+                                    />
+                                );
+                            })
+                        }
                     </div>
                 </div>
                 <div className="w-[70%] bg-white rounded-2xl shadow-md overflow-hidden font-sans min-h-screen">
                     <div className="flex items-center justify-between px-4 py-3">
-                        <div className="w-full p-5 shadow">
-                            <h3>user name</h3>
-                        </div>
-
+                        {
+                            activeConversation &&
+                            <div className="w-full p-5 shadow">
+                                <h3 h3 > {activeConversation.userId}</h3>
+                            </div>
+                        }
                     </div>
                     <div className="px-4 py-3 h-[360px] overflow-y-auto space-y-4 bg-gray-50">
-                        <p className="text-center text-xs text-gray-400">Today</p>
-                        <div className="flex gap-2">
-                            <img
-                                src="https://i.pravatar.cc/40?img=32"
-                                alt="agent"
-                                className="w-8 h-8 rounded-full"
-                            />
-                            <div className="bg-white px-4 py-2 rounded-xl shadow text-sm text-gray-800 max-w-[75%]">
-                                Hi there! 👋 How can we help you today?
-                                <div className="text-[10px] text-gray-400 mt-1">10:23 AM</div>
+                        {!
+                            activeConversation ? (
+                            <div className="w-full h-full flex items-center justify-center">
+                                <h3 className="font-semibold capitalize">plase slect any user and star to chatting....</h3>
                             </div>
-                        </div>
-{/* 
-                        {
-                            message.map((val, index) => {
-                                const { id, text, time } = val
-                                return (
-                                    <div key={index} className="flex mt-[70px]  justify-end items-center relative">
-                                        <div className="bg-blue-500 text-white px-4 py-2 rounded-xl shadow text-sm max-w-[75%]">
-                                            {text}
-                                            <div className="text-[10px] text-blue-100 mt-1 text-right">
-                                                {time}
+                        ) : (<>
+                            <p className="text-center text-xs text-gray-400">Today</p>
+                            {
+                                messages.map((val) => {
+                                    const { createdAt, sender, text, _id } = val;
+                                    return (
+                                        <div key={_id} className={` flex mb-3 ${sender === "admin" ? "justify-end" : "justify-start"}`}>
+                                            <div className={`rounded-2xl p-4 max-w-[70%] shadow-md text-sm ${sender === "admin" ? "bg-blue-500 text-white" : "bg-white text-black"}`}>
+                                                {text}
+                                                <div>
+                                                    {/* <span>{formatTime}</span> */}
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className={`w-[30px] p-5 rounded bg-white shadow-lg absolute top-[50px] right-1 flex items-center justify-center gap-1.5 flex-col  duration-150 ${openDotsId === id ? "scale-[1]" : "scale-0"}`}>
-                                            <MdDelete onClick={() => handeldeleteSms(val.id)} className="cursor-pointer text-red-600" />
-                                            <FiEdit onClick={() => handelEditSms(id)} className="cursor-pointer text-blue-500" />
-                                        </div>
-                                        <HiOutlineDotsVertical onClick={() => handelDots(id)} className="cursor-pointer" />
-                                    </div>
-                                )
-                            })
-                        } */}
-                        <div ref={bottomRef}></div>
-                    </div>
+                                    )
+                                })
+                            }
+                            <div ref={bottomRef}></div>
+                        </>)
+                        }
+                    </div >
 
-                    <div className="flex items-center gap-2 px-3 py-2 border-t bg-white">
-                        <input
-                            type="text"
-                            placeholder="Type your message..."
-                            className="flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={userSms}
-                            onChange={(e) => setUserSms(e.target.value)}
-                            onKeyDown={handelkeyDown}
-                        />
-                        <button onClick={handelSendSms} className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg">
-                            <Send size={18} />
-                        </button>
-                    </div>
-                </div>
-            </section>
-
+                    {
+                        activeConversation && <div className="flex items-center gap-2 px-3 py-2 border-t bg-white">
+                            <input
+                                type="text"
+                                placeholder="Type your message..."
+                                className="flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                value={adminSms}
+                                onChange={(e) => setadminSms(e.target.value)}
+                                onKeyDown={handlekeyDown}
+                            />
+                            <button onClick={handleSendSms} className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg">
+                                <Send size={18} />
+                            </button>
+                        </div>
+                    }
+                </div >
+            </section >
         </>
     );
 };

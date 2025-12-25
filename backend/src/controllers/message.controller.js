@@ -43,3 +43,34 @@ exports.getMessageByConversationId = async (req, res) => {
         })
     }
 }
+
+exports.getConversations = async (req, res) => {
+    try {
+        const conversations = await messageModel.aggregate([
+            { $match: { sender: "user" } },
+            {
+                $group: {
+                    _id: "$conversationId",
+                    userId: { $first: "$senderId" },
+                    lastMessage: { $last: "$text" },
+                    updatedAt: { $last: "$createdAt" }
+                }
+            },
+            {
+
+                $sort: {
+                    updatedAt: -1
+                }
+            }
+        ])
+        res.status(200).json({
+            success: true,
+            data: conversations
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        })
+    }
+}
