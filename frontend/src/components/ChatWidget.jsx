@@ -7,15 +7,13 @@ import { FiEdit } from "react-icons/fi";
 import axios from 'axios';
 const ChatWidget = ({ toggleChatWidget }) => {
     const Apiurl = import.meta.env.VITE_SERVER_URL;
-    console.log("Api", Apiurl);
+    console.log("Apiurl",Apiurl)
     const AdminId = "admin_1";
-
     const bottomRef = useRef()
     const [userSms, setUserSms] = useState("");
     const [message, setMessage] = useState([]);
     const [openDotsId, setOpenDotsId] = useState(null)
     const [userId, setuserId] = useState('')
-
     useEffect(() => {
         let storedUserId = localStorage.getItem('user_id');
         if (!storedUserId || storedUserId === null || storedUserId === undefined) {
@@ -29,8 +27,6 @@ const ChatWidget = ({ toggleChatWidget }) => {
         setuserId(storedUserId);
 
     }, [])
-
-
 
     const handelSendSms = async () => {
         if (!userSms) {
@@ -102,8 +98,6 @@ const ChatWidget = ({ toggleChatWidget }) => {
                 {
                     message.map((val) => {
                         const { createdAt, sender, text, _id } = val;
-                        
-
                         return (
                             <div key={_id} className={` flex mb-3 ${sender === "admin" ? "justify-start" : "justify-end"}`}>
                                 <div className={`rounded-2xl p-4 max-w-[70%] shadow-md text-sm ${sender === "admin" ? "bg-white text-black" : "bg-blue-500 text-white"}`}>
@@ -113,13 +107,11 @@ const ChatWidget = ({ toggleChatWidget }) => {
                                     </div>
                                 </div>
                             </div>
-
                         )
                     })
                 }
                 <div ref={bottomRef}></div>
             </div>
-
             <div className="flex items-center gap-2 px-3 py-2 border-t bg-white">
                 <input
                     type="text"

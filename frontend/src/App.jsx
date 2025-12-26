@@ -8,10 +8,6 @@ const App = () => {
   const toggleChatWidget = () => {
     setIsOpen(!isOpen);
   }
-
-  useEffect(() => {
-
-  }, [])
   return (
     <>
       <section className='bg-white w-full min-h-screen relative'>

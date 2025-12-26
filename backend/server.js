@@ -9,6 +9,7 @@ connectToDatabase();
 
 app.use(cors());
 
+
 app.use(express.json())
 app.get('/', (req, res) => {
     res.send('Hello World!')
@@ -16,6 +17,8 @@ app.get('/', (req, res) => {
 app.get('/about', (req, res) => {
     res.send(' about')
 })
+
+app.use("/widget", express.static("dist"));
 app.use('/api', messageRouter)
 
 const port = process.env.PORT || 3000
