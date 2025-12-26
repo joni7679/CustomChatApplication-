@@ -18,7 +18,10 @@ app.get('/about', (req, res) => {
     res.send(' about')
 })
 
-app.use("/widget", express.static("dist"));
+app.use(
+    "/widget",
+    express.static(path.join(__dirname, "../frontend/dist/chat-widget.iife.js"))
+);
 app.use('/api', messageRouter)
 
 const port = process.env.PORT || 3000
