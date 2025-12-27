@@ -8,7 +8,7 @@ import "./index.css";
     window.__MY_CHAT_WIDGET__ = true;
 
     const div = document.createElement("div");
-    div.id = "chat-widget";
+    div.id = "chat-widget-root";
     div.style.position = "fixed";
     div.style.bottom = "20px";
     div.style.right = "20px";
